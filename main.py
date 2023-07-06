@@ -3,7 +3,7 @@ import re
 from typing import Optional
 import mwparserfromhell
 import pywikibot as pwb
-
+from pywikibot.textlib import Section
 
 ### configuration ###
 ARCHIVE_TEMPLATES = [ 'deleted', 'not deleted', 'merged', 'done', 'not done', 'notdone' ]
@@ -11,7 +11,7 @@ CURRENT_RFD_PAGE = 'Wikidata:Requests for deletions'
 ARCHIVE_PAGE = f'Wikidata:Requests for deletions/Archive/{strftime("%Y/%m/%d")}'
 
 
-def eval_body_parts(body:list[pwb.textlib._Section]) -> tuple[list[pwb.textlib._Section], list[pwb.textlib._Section]]:
+def eval_body_parts(body:list[Section]) -> tuple[list[Section], list[Section]]:
     part_headline = re.compile(r'^==[^=]') # second-level headline
 
     kept_parts = []
@@ -44,7 +44,7 @@ def eval_body_parts(body:list[pwb.textlib._Section]) -> tuple[list[pwb.textlib._
     return kept_parts, archived_parts
 
 
-def new_rfd_text(header:str, footer:str, parts:list[pwb.textlib._Section]) -> str:
+def new_rfd_text(header:str, footer:str, parts:list[Section]) -> str:
     wikitext = header
     for part in parts:
         wikitext += part.title
@@ -54,7 +54,7 @@ def new_rfd_text(header:str, footer:str, parts:list[pwb.textlib._Section]) -> st
     return wikitext
 
 
-def new_rfd_archive_text(archive:pwb.Page, parts:list[pwb.textlib._Section]) -> str:
+def new_rfd_archive_text(archive:pwb.Page, parts:list[Section]) -> str:
     if archive.exists() is False:
         wikitext = '{{Archive|category=Archived requests for deletion}}\n\n'
     else:
@@ -74,8 +74,8 @@ def print_log(page:pwb.page.BasePage, err:Optional[Exception]):
         print(f'An exception occurred while saving page "{page.title()}": {err}')
 
 
-def print_output(body:list[pwb.textlib._Section], kept_parts:list[pwb.textlib._Section], \
-                 archived_parts:list[pwb.textlib._Section], archive_exists:bool) -> None:
+def print_output(body:list[Section], kept_parts:list[Section], \
+                 archived_parts:list[Section], archive_exists:bool) -> None:
     print(f'== {strftime("%Y-%m-%d, %H:%M:%S")} ==')
     print(f'Archive: "{ARCHIVE_PAGE}"')
     print(f'Templates that trigger archiving: {", ".join(ARCHIVE_TEMPLATES)}\n')
@@ -99,7 +99,7 @@ def main() -> None:
 
     sections = pwb.textlib.extract_sections(rfd.get(), site)
     header:str = sections[0]
-    body:list[pwb.textlib._Section] = sections[1] # list of namedtuples
+    body:list[Section] = sections[1] # list of namedtuples
     footer:str = sections[2]
 
     kept_parts, archived_parts = eval_body_parts(body)
