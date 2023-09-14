@@ -18,7 +18,7 @@ spec:
         spec:
           containers:
           - name: rfd-archiver
-            image: docker-registry.tools.wmflabs.org/toolforge-python39-sssd-base:latest
+            image: docker-registry.tools.wmflabs.org/toolforge-python311-sssd-base:latest
             workingDir: /data/project/msynbot/pywikibot_tasks/rfd_archiver
             command: [ venv/bin/python3 ]
             args: [ main.py ]
@@ -34,4 +34,4 @@ spec:
               value: /data/project/shared/pywikibot/stable
             - name: HOME
               value: /data/project/msynbot
-          restartPolicy: OnFailure
+          restartPolicy: Never
